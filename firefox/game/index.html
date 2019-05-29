@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Simon for Firefox</title>
+		<link rel="stylesheet" href="style.css"/>
+	</head>
+	<body>
+		<audio id="audRed">
+			<source src="../audio/red.ogg" type="audio/ogg"/>
+		</audio>
+		<audio id="audBlue">
+			<source src="../audio/blue.ogg" type="audio/ogg"/>
+		</audio>
+		<audio id="audYellow">
+			<source src="../audio/yellow.ogg" type="audio/ogg"/>
+		</audio>
+		<audio id="audGreen">
+			<source src="../audio/green.ogg" type="audio/ogg"/>
+		</audio>
+		
+		<button id="btnGreen" disabled></button><button id="btnRed" disabled></button>
+		<br>
+		<button id="btnBlue" disabled></button><button id="btnYellow" disabled></button>
+		<br>
+		<span id="round"></span>
+		<br>
+		<button id="btnStart">PLAY</button>
+		<img src="../images/audioon.png" title="Turn audio off" id="audioToggle" />
+		<script src="script.js"></script>
+	</body>
+</html>

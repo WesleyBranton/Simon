@@ -1,0 +1,79 @@
+body {
+	text-align: center;
+	height: 400px;
+	width: 400px;
+	background: linear-gradient(90deg, #DDDDDD, white, #DDDDDD);
+}
+
+button {
+	width: 150px;
+	height: 150px;
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	cursor: pointer;
+}
+
+button#btnRed {
+	border-top-right-radius: 100%;
+	background: radial-gradient(at bottom left, #f5AAA3, #E93F2F);
+}
+
+button#btnBlue {
+	border-bottom-left-radius: 100%;
+	background: radial-gradient(at top right, #b7d1fb, #3E84f4);
+}
+
+button#btnYellow {
+	border-bottom-right-radius: 100%;
+	background: radial-gradient(at top left, #fdde81, #FBBC05);
+}
+
+button#btnGreen {
+	border-top-left-radius: 100%;
+	background: radial-gradient(at bottom right, #8adba0, #36B056);
+}
+
+button#btnStart {
+	border-radius: 300px;
+	width: 250px;
+	height: auto;
+	font-size: 200%;
+	background-color: #9933FF;
+	font-weight: bold;
+	color: white;
+	text-shadow: 0px -2px #4D0099;
+	border-bottom: 4px solid #4D0099;
+}
+
+#round {
+	font-size: 200%;
+	font-weight: bold;
+}
+
+button:disabled {
+	cursor: not-allowed;
+}
+
+#audioToggle {
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
+	width: 40px;
+	height: 30px;
+	cursor: pointer;
+}
+
+@keyframes blinking {
+	0% {filter: brightness(150%);}
+	50% {filter: brightness(100%);}
+	100% {filter: brightness(150%);}
+}
+
+.blink {
+	animation-name: blinking;
+	animation-duration: 1s;
+	animation-timing-function: ease;
+	animation-iteration-count: infinite;
+	animation-delay: 0.6s;
+}
