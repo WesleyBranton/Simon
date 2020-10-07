@@ -23,5 +23,5 @@
 		"page": "options/options.html"
 	},
 
-	"permissions": ["storage", "tabs"]
+	"permissions": ["storage"]
 }
