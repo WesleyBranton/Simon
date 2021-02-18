@@ -15,3 +15,4 @@ To develop and test the extension, you need to open the "about:debugging" page i
 Further documentation about developing Firefox extensions can be found [here](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension).
 
 ## Release Notes
+Release notes can be found on [this GitHub repository](https://github.com/WesleyBranton/Simon/releases) or [the Firefox add-ons listing](https://addons.mozilla.org/firefox/addon/simon/versions/).
