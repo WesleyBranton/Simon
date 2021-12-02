@@ -51,7 +51,8 @@ button.lit {
 	background: radial-gradient(at bottom right, var(--green-light), var(--green-dark));
 }
 
-#button-start {
+#button-start,
+#button-back {
 	border-radius: 300px;
 	width: 250px;
 	height: auto;
@@ -62,6 +63,23 @@ button.lit {
 	text-shadow: 0px -2px #4D0099;
 	border-bottom: 4px solid #4D0099;
 	text-transform: uppercase;
+}
+
+#input-nickname {
+	margin: 0 0 0.2em 0;
+	padding: 0px;
+	border: none;
+	border-radius: 300px;
+	width: 250px;
+	height: auto;
+	font-size: 200%;
+	background-color: white;
+	font-weight: bold;
+	color: #404040;
+	text-shadow: 0px -2px #B3B3B3;
+	border-bottom: 4px solid #B3B3B3;
+	text-transform: uppercase;
+	text-align: center;
 }
 
 #text-round {
@@ -80,6 +98,37 @@ button:disabled {
 	width: 40px;
 	height: 30px;
 	cursor: pointer;
+}
+
+#button-highscores {
+	position: fixed;
+	bottom: 5px;
+	left: 5px;
+	width: 40px;
+	height: 30px;
+	cursor: pointer;
+}
+
+#table-highscores {
+	width: 75%;
+	margin: 0 auto 1.5em auto;
+	border-spacing: 0;
+}
+
+#table-highscores td {
+	padding: 0.2em 0.5em;
+}
+
+#table-highscores tr > td:first-child {
+	text-align: left;
+}
+
+#table-highscores tr > td:last-child {
+	text-align: right;
+}
+
+#table-highscores tr.highlight {
+	background: gold;
 }
 
 .hide {

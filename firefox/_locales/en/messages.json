@@ -6,8 +6,23 @@
         "message": "Test your memory skills with this classic memory game!"
     },
 
+    "headerHighscores": {
+        "message": "Highscores"
+    },
+
+    "fieldNickname": {
+        "message": "Name"
+    },
+
+    "highscoreUnknownName": {
+        "message": "???"
+    },
+
     "actionPlay": {
         "message": "Play"
+    },
+    "actionBack": {
+        "message": "Back"
     },
 
     "tooltipAudioOff": {

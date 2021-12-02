@@ -11,14 +11,29 @@
 		<link rel="stylesheet" href="style.css"/>
 	</head>
 	<body>
-		<button id="button-green" data-color="green" disabled></button><button id="button-red" data-color="red" disabled></button>
-		<br>
-		<button id="button-blue" data-color="blue" disabled></button><button id="button-yellow" data-color="yellow" disabled></button>
-		<br>
-		<span id="text-round"></span>
-		<br>
-		<button id="button-start" data-i18n="actionPlay"></button>
+		<div id="screen-game">
+			<button id="button-green" data-color="green" disabled></button><button id="button-red" data-color="red" disabled></button>
+			<br>
+			<button id="button-blue" data-color="blue" disabled></button><button id="button-yellow" data-color="yellow" disabled></button>
+			<br>
+			<span id="text-round"></span>
+			<div id="container-pregame">
+				<br>
+				<input id="input-nickname" maxlength="3">
+				<br>
+				<button id="button-start" data-i18n="actionPlay"></button>
+			</div>
+			<img src="../images/highscores.svg" id="button-highscores">
+		</div>
+
+		<div id="screen-highscores" class="hide">
+			<h2 data-i18n="headerHighscores"></h2>
+			<table id="table-highscores"></table>
+			<button id="button-back" data-i18n="actionBack"></button>
+		</div>
+
 		<img src="../images/audioon.png" id="button-audio">
+
 		<script src="../lib/i18n.js"></script>
 		<script src="script.js"></script>
 	</body>

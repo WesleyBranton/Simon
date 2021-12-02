@@ -9,7 +9,7 @@
 async function openGame() {
 	if (gameWindow == null) {
 		gameWindow = await browser.windows.create({
-			height: 500,
+			height: 600,
 			width: 400,
 			focused: true,
 			type: browser.windows.CreateType.PANEL,
