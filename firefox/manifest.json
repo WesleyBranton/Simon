@@ -12,15 +12,10 @@
 	"browser_action": {
 		"default_icon": "icons/icon-32.png",
 		"default_title": "Simon",
-		"default_popup": "game/index.html"
 	},
 	
 	"background": {
 		"scripts": [ "background.js" ]
-	},
-	
-	"options_ui": {
-		"page": "options/options.html"
 	},
 
 	"permissions": ["storage"]

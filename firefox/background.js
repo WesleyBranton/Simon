@@ -2,14 +2,39 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-function handleInstalled(details) {
-	// Creates Setting Defaults After Installation
-	if (details.reason == 'install') {
-		browser.storage.local.set({
-			setting: {
-				audioEnabled: true
-			}
+/**
+ * Open/Focus game window
+ * @async
+ */
+async function openGame() {
+	if (gameWindow == null) {
+		gameWindow = await browser.windows.create({
+			height: 500,
+			width: 400,
+			focused: true,
+			type: browser.windows.CreateType.PANEL,
+			url: 'game/index.html'
+		});
+	} else {
+		browser.windows.update(gameWindow.id, {
+			focused: true,
+			drawAttention: true
 		});
 	}
 }
-browser.runtime.onInstalled.addListener(handleInstalled);
+
+/**
+ * Remove game window if it's closed
+ * @param {number} windowId Window ID
+ */
+function manageGameWindow(windowId) {
+	if (gameWindow != null) {
+		if (gameWindow.id == windowId) {
+			gameWindow = null;
+		}
+	}
+}
+
+let gameWindow = null;
+browser.browserAction.onClicked.addListener(openGame);
+browser.windows.onRemoved.addListener(manageGameWindow);

@@ -1,183 +1,206 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
-
-// Initialization
-disableGame();
-document.getElementById('btnStart').addEventListener('click',function() {
-	document.getElementById('btnStart').style.display = 'none';
-	document.getElementById('btnStart').textContent = 'PLAY AGAIN';
-	document.getElementById('btnRed').className = '';
-	document.getElementById('btnGreen').className = '';
-	document.getElementById('btnBlue').className = '';
-	document.getElementById('btnYellow').className = '';
-	disableGame();
-	runPattern();
-});
-document.getElementById('btnRed').addEventListener('click',pressRed);
-document.getElementById('btnGreen').addEventListener('click',pressGreen);
-document.getElementById('btnBlue').addEventListener('click',pressBlue);
-document.getElementById('btnYellow').addEventListener('click',pressYellow);
-browser.storage.local.get('setting', (res) => {
-	var audioEnabled = res.setting.audioEnabled;
-	if (audioEnabled) {
-		browser.storage.local.set({
-			setting: {
-				audioEnabled: false
-			}
-		});
-	} else {
-		browser.storage.local.set({
-			setting: {
-				audioEnabled: true
-			}
-		});
-	}
-	toggleAudio();
-});
-document.getElementById('audioToggle').addEventListener('click',toggleAudio);
-var patternInc = 2;
-var userInc = 0;
-var patternCol = new Array();
-var round = 2;
-
-function pressRed() {
-	// If user selects red button
-	var color = 'Red';
-	var pressBy = 'user';
-	buttonPress(color,pressBy);
-}
-function pressGreen() {
-	// If user selects green button
-	var color = 'Green';
-	var pressBy = 'user';
-	buttonPress(color,pressBy);
-}
-function pressBlue() {
-	// If user selects blue button
-	var color = 'Blue';
-	var pressBy = 'user';
-	buttonPress(color,pressBy);
-}
-function pressYellow() {
-	// If user selects yellow button
-	var color = 'Yellow';
-	var pressBy = 'user';
-	buttonPress(color,pressBy);
+/**
+ * Initialize game
+ *   - Load data from Storage API
+ */
+function init() {
+    browser.storage.local.get((data) => {
+        audioEnabled = (typeof data.audioEnabled == 'boolean') ? data.audioEnabled : true;
+        updateAudioButton();
+    });
 }
 
-function buttonPress(color,pressBy) {
-	// Plays audio
-	browser.storage.local.get('setting', (res) => {
-		if (res.setting.audioEnabled) {
-			var audio = document.getElementById('aud' + color);
-			audio.play();
-		}
-	});
-	
-	// Lights up
-	var button = document.getElementById('btn' + color);
-	button.style.filter = 'brightness(150%)';
-	setTimeout(function() {
-		button.style.filter = 'brightness(100%)';
-	},500);
-		
-	// Detects button press or computer pattern
-	if (pressBy == 'user') {
-		checkSelection(color);
-	} else {
-		setTimeout(runPattern,600);
-	}
+/**
+ * Start new game
+ */
+function startGame() {
+    pattern = new Array();
+    round = 0;
+
+    UI.button.start.classList.add('hide');
+    
+    updateRoundCounter();
+    startRound();
 }
 
-function checkSelection(colorSel) {
-	// Determines what color is correct
-	var colorLook = patternCol[userInc];
-	if (colorLook == colorSel) {
-		// If the user is correct
-		userInc++;
-		if (!patternCol[userInc]) {
-			// If the round is complete
-			userInc = 0;
-			disableGame();
-			setTimeout(runPattern,1000);
-		}
-	} else {
-		// If the user is wrong
-		document.getElementById('btn' + colorLook).className = 'blink';
-		disableGame();
-		document.getElementById('btnStart').style.display = 'inline-block';
-		patternInc = 2;
-		userInc = 0;
-		patternCol = [];
-		round = 2;
-	}
+/**
+ * Enable/Disable game color buttons
+ * @param {boolean} enabled Enable buttons
+ */
+function toggleGameButtons(enabled) {
+    for (const button of Object.values(UI.button.color)) {
+        button.disabled = !enabled;
+        button.classList.remove('blink');
+    }
 }
 
-function runPattern() {
-	if (round == patternInc) {
-		// Generates color
-		document.getElementById('round').textContent = 'Round: ' + (round - 1);
-		var colors = ['Red','Green','Blue','Yellow'];
-		var pressBy = 'comp';
-		var genCol = Math.floor(Math.random() * 4);
-		genCol = colors[genCol];
-		patternInc--;
-		patternCol.push(genCol);
-		runPattern();
-	} else if (round > patternInc && patternInc > 0) {
-		// Play pattern
-		var genCol = patternCol[round-patternInc-1];
-		var pressBy = 'comp';
-		patternInc--;
-		buttonPress(genCol,pressBy);
-	} else {
-		enableGame();
-		round++;
-		patternInc = round;
-	}
+/**
+ * Process user game button press event
+ * @param {Event} event Button event
+ */
+function handleGameButtonPress(event) {
+	const color = COLOR[event.target.dataset.color];
+	buttonPress(color);
+
+    if (checkSelection(color)) {
+        ++currentGuessingPosition;
+
+        if (currentGuessingPosition >= pattern.length) {
+            startRound();
+        }
+    } else {
+        gameOver();
+    }
 }
 
-function disableGame() {
-	// Prevents user from clicking game buttons
-	document.getElementById('btnRed').disabled = true;
-	document.getElementById('btnGreen').disabled = true;
-	document.getElementById('btnBlue').disabled = true;
-	document.getElementById('btnYellow').disabled = true;
+/**
+ * Trigger button press effect
+ * @param {string} color Color
+ */
+function buttonPress(color) {
+    // Play audio
+    if (audioEnabled) {
+        AUDIO[color].play();
+    }
+
+    // Light up
+    UI.button.color[color].classList.add('lit');
+    setTimeout(() => {
+		UI.button.color[color].classList.remove('lit');
+	}, buttonLightDuration);
 }
 
-function enableGame() {
-	// Allows user to click game buttons
-	document.getElementById('btnRed').disabled = false;
-	document.getElementById('btnGreen').disabled = false;
-	document.getElementById('btnBlue').disabled = false;
-	document.getElementById('btnYellow').disabled = false;
+/**
+ * Check if user entered color matches pattern
+ * @param {string} color Color
+ * @returns Is correct
+ */
+function checkSelection(color) {
+    return pattern[currentGuessingPosition] == color;
 }
 
+/**
+ * Handle game over event
+ */
+function gameOver() {
+    toggleGameButtons(false);
+    UI.button.start.classList.remove('hide');
+    UI.button.color[pattern[currentGuessingPosition]].classList.add('blink');
+}
+
+/**
+ * Start next round
+ */
+function startRound() {
+    toggleGameButtons(false);
+
+    ++round;
+    updateRoundCounter();
+    
+    currentGuessingPosition = 0;
+    addToPattern();
+
+    setTimeout(() => {
+        playPattern(0);
+    }, roundDelay);
+}
+
+/**
+ * Add color to pattern
+ */
+ function addToPattern() {
+    const color = Object.values(COLOR)[Math.floor(Math.random() * 4)];
+    pattern.push(color);
+}
+
+/**
+ * Recursively play pattern
+ * @param {number} index Currently on
+ */
+function playPattern(index) {
+    if (index < pattern.length) {
+        buttonPress(pattern[index]);
+
+        setTimeout(() => {
+            playPattern(++index);
+        }, buttonDelay);
+    } else {
+        toggleGameButtons(true);
+    }
+}
+
+/**
+ * Update the round counter UI
+ */
+function updateRoundCounter() {
+    UI.text.round.textContent = (round < 1) ? 1 : round;
+}
+
+/**
+ * Toggle audio setting
+ */
 function toggleAudio() {
-	browser.storage.local.get('setting', (res) => {
-		var audioEnabled = res.setting.audioEnabled;
-		var audioToggle = document.getElementById('audioToggle');
-		if (audioEnabled) {
-			// Disables game audio
-			audioToggle.src = '../images/audiooff.png';
-			audioToggle.title = 'Turn audio on';
-			audioEnabled = false;
-			browser.storage.local.set({
-				setting: {
-					audioEnabled: false
-				}
-			});
-		} else {
-			// Enables game audio
-			audioToggle.src = '../images/audioon.png';
-			audioToggle.title = 'Turn audio off';
-			audioEnabled = true;
-			browser.storage.local.set({
-				setting: {
-					audioEnabled: true
-				}
-			});
-		}
-	});
+    audioEnabled = !audioEnabled;
+    updateAudioButton();
+    browser.storage.local.set({
+        audioEnabled: audioEnabled
+    });
 }
+
+function updateAudioButton() {
+    if (audioEnabled) {
+        UI.button.audio.src = '../images/audioon.png';
+        UI.button.audio.title = 'Turn audio off';
+    } else {
+        UI.button.audio.src = '../images/audiooff.png';
+		UI.button.audio.title = 'Turn audio on';
+    }
+}
+
+const UI = {
+	button: {
+        color: {
+            red: document.getElementById('button-red'),
+            yellow: document.getElementById('button-yellow'),
+            green: document.getElementById('button-green'),
+            blue: document.getElementById('button-blue')
+        },
+		start: document.getElementById('button-start'),
+        audio: document.getElementById('button-audio')
+	},
+    text: {
+        round: document.getElementById('text-round')
+    }
+};
+
+const AUDIO = {
+    red: new Audio('../audio/red.ogg'),
+    yellow: new Audio('../audio/yellow.ogg'),
+    green: new Audio('../audio/green.ogg'),
+    blue: new Audio('../audio/blue.ogg')
+};
+
+const COLOR = {
+	red: 'red',
+	yellow: 'yellow',
+	green: 'green',
+	blue: 'blue'
+}
+
+UI.button.color.red.addEventListener('click', handleGameButtonPress);
+UI.button.color.green.addEventListener('click', handleGameButtonPress);
+UI.button.color.blue.addEventListener('click', handleGameButtonPress);
+UI.button.color.yellow.addEventListener('click', handleGameButtonPress);
+UI.button.start.addEventListener('click', startGame);
+UI.button.audio.addEventListener('click', toggleAudio);
+
+const buttonLightDuration = 500;
+const buttonDelay = 600;
+const roundDelay = 1000;
+let audioEnabled = true;
+
+let pattern = new Array();
+let currentGuessingPosition = 0;
+let round = 0;
+
+i18nParse();
+init();

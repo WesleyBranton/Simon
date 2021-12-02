@@ -2,10 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+:root {
+	--red-dark: #E93F2F;
+	--red-light: #F5AAA3;
+	--blue-dark: #3E84f4;
+	--blue-light: #B7D1FB;
+	--yellow-dark: #FBBC05;
+	--yellow-light: #FDDE81;
+	--green-dark: #36B056;
+	--green-light: #8ADBA0;
+}
+
 body {
 	text-align: center;
-	height: 400px;
-	width: 400px;
 	background: linear-gradient(90deg, #DDDDDD, white, #DDDDDD);
 }
 
@@ -18,27 +27,31 @@ button {
 	cursor: pointer;
 }
 
-button#btnRed {
+button.lit {
+	filter: brightness(150%);
+}
+
+#button-red {
 	border-top-right-radius: 100%;
-	background: radial-gradient(at bottom left, #f5AAA3, #E93F2F);
+	background: radial-gradient(at bottom left, var(--red-light), var(--red-dark));
 }
 
-button#btnBlue {
+#button-blue {
 	border-bottom-left-radius: 100%;
-	background: radial-gradient(at top right, #b7d1fb, #3E84f4);
+	background: radial-gradient(at top right, var(--blue-light), var(--blue-dark));
 }
 
-button#btnYellow {
+#button-yellow {
 	border-bottom-right-radius: 100%;
-	background: radial-gradient(at top left, #fdde81, #FBBC05);
+	background: radial-gradient(at top left, var(--yellow-light), var(--yellow-dark));
 }
 
-button#btnGreen {
+#button-green {
 	border-top-left-radius: 100%;
-	background: radial-gradient(at bottom right, #8adba0, #36B056);
+	background: radial-gradient(at bottom right, var(--green-light), var(--green-dark));
 }
 
-button#btnStart {
+#button-start {
 	border-radius: 300px;
 	width: 250px;
 	height: auto;
@@ -48,9 +61,10 @@ button#btnStart {
 	color: white;
 	text-shadow: 0px -2px #4D0099;
 	border-bottom: 4px solid #4D0099;
+	text-transform: uppercase;
 }
 
-#round {
+#text-round {
 	font-size: 200%;
 	font-weight: bold;
 }
@@ -59,13 +73,17 @@ button:disabled {
 	cursor: not-allowed;
 }
 
-#audioToggle {
+#button-audio {
 	position: fixed;
 	bottom: 5px;
 	right: 5px;
 	width: 40px;
 	height: 30px;
 	cursor: pointer;
+}
+
+.hide {
+	display: none !important;
 }
 
 @keyframes blinking {
