@@ -1,0 +1,19 @@
+{
+    "extensionName": {
+        "message": "Simon"
+    },
+    "extensionDescription": {
+        "message": "Test your memory skills with this classic memory game!"
+    },
+
+    "actionPlay": {
+        "message": "Play"
+    },
+
+    "tooltipAudioOff": {
+        "message": "Turn audio off"
+    },
+    "tooltipAudioOn": {
+        "message": "Turn audio on"
+    }
+}

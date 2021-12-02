@@ -1,8 +1,9 @@
 {
 	"manifest_version": 2,
-	"name": "Simon",
+	"name": "__MSG_extensionName__",
 	"version": "1.0",
-	"description": "Test your memory skills with this classic memory game!",
+	"description": "__MSG_extensionDescription__",
+	"default_locale": "en",
 
 	"icons": {
 		"48": "icons/icon-48.png",
@@ -11,7 +12,7 @@
 
 	"browser_action": {
 		"default_icon": "icons/icon-32.png",
-		"default_title": "Simon",
+		"default_title": "__MSG_extensionName__"
 	},
 	
 	"background": {

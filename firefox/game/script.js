@@ -149,10 +149,10 @@ function toggleAudio() {
 function updateAudioButton() {
     if (audioEnabled) {
         UI.button.audio.src = '../images/audioon.png';
-        UI.button.audio.title = 'Turn audio off';
+        UI.button.audio.title = browser.i18n.getMessage('tooltipAudioOff');
     } else {
         UI.button.audio.src = '../images/audiooff.png';
-		UI.button.audio.title = 'Turn audio on';
+		UI.button.audio.title = browser.i18n.getMessage('tooltipAudioOn');
     }
 }
 
