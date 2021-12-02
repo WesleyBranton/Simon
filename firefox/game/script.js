@@ -3,9 +3,19 @@
  *   - Load data from Storage API
  */
 function init() {
+    UI.input.nickname.placeholder = browser.i18n.getMessage('fieldNickname');
+    UI.button.highscores.title = browser.i18n.getMessage('headerHighscores');
+
     browser.storage.local.get((data) => {
         audioEnabled = (typeof data.audioEnabled == 'boolean') ? data.audioEnabled : true;
         updateAudioButton();
+
+        highscores = (typeof data.highscores == 'object') ? data.highscores : new Array();
+        sortHighscores();
+        updateHighscores();
+
+        lastUsedName = (typeof data.lastUsedName == 'string') ? data.lastUsedName : null;
+        UI.input.nickname.value = lastUsedName;
     });
 }
 
@@ -16,7 +26,14 @@ function startGame() {
     pattern = new Array();
     round = 0;
 
-    UI.button.start.classList.add('hide');
+    UI.container.pregame.classList.add('hide');
+    UI.button.highscores.classList.add('hide');
+
+    formatNickname();
+    lastUsedName = (UI.input.nickname.value.length > 0) ? UI.input.nickname.value : null;
+    browser.storage.local.set({
+        lastUsedName: lastUsedName
+    });
     
     updateRoundCounter();
     startRound();
@@ -59,6 +76,7 @@ function handleGameButtonPress(event) {
 function buttonPress(color) {
     // Play audio
     if (audioEnabled) {
+        AUDIO[color].currentTime = 0;
         AUDIO[color].play();
     }
 
@@ -83,8 +101,18 @@ function checkSelection(color) {
  */
 function gameOver() {
     toggleGameButtons(false);
-    UI.button.start.classList.remove('hide');
+    UI.container.pregame.classList.remove('hide');
+    UI.button.highscores.classList.remove('hide');
     UI.button.color[pattern[currentGuessingPosition]].classList.add('blink');
+
+    --round;
+    updateRoundCounter();
+
+    if (isHighscore(round)) {
+        const index = addHighscore(round, lastUsedName);
+        changeScreen('highscores');
+        highlightHighscore(index);
+    }
 }
 
 /**
@@ -146,14 +174,151 @@ function toggleAudio() {
     });
 }
 
+/**
+ * Update label and icon of audio button
+ */
 function updateAudioButton() {
     if (audioEnabled) {
         UI.button.audio.src = '../images/audioon.png';
-        UI.button.audio.title = 'Turn audio off';
+        UI.button.audio.title = browser.i18n.getMessage('tooltipAudioOff');
     } else {
         UI.button.audio.src = '../images/audiooff.png';
-		UI.button.audio.title = 'Turn audio on';
+		UI.button.audio.title = browser.i18n.getMessage('tooltipAudioOn');
     }
+}
+
+/**
+ * Check if score is a new highscore
+ * @param {number} score Score
+ * @returns Is highscore
+ */
+function isHighscore(score) {
+    if (score > 0) {
+        if (highscores.length < maxHighscoresSaved) {
+            return true;
+        } else {
+            return score > highscores[highscores.length - 1].score;
+        }
+    }
+}
+
+/**
+ * Save new highscore to storage
+ * @param {number} score Score
+ * @returns Index of new score
+ */
+function addHighscore(score) {
+    const newHighscore = {
+        name: lastUsedName,
+        score: score,
+        date: Date.now()
+    };
+    highscores.push(newHighscore);
+    sortHighscores();
+
+    if (highscores.length > maxHighscoresSaved) {
+        highscores = highscores.slice(0, maxHighscoresSaved);
+    }
+
+    updateHighscores();
+
+    browser.storage.local.set({
+        highscores: highscores
+    });
+
+    return highscores.indexOf(newHighscore);
+}
+
+/**
+ * Sort highscores by score and date
+ */
+function sortHighscores() {
+    highscores.sort((a, b) => {
+        if (a.score == b.score) {
+            return a.date - b.date;
+        } else {
+            return b.score - a.score;
+        }
+    });
+}
+
+/**
+ * Update highscore list in UI
+ */
+function updateHighscores() {
+    UI.table.highscores.textContent = '';
+
+    for (const highscore of Object.values(highscores)) {
+        createHighscoreRow(highscore);
+    }
+
+    for (let i = highscores.length; i < maxHighscoresSaved; i++) {
+        createHighscoreRow({
+            name: '---',
+            score: '--'
+        });
+    }
+}
+
+/**
+ * Highlight row on highscores table
+ * @param {number} index Row index
+ */
+function highlightHighscore(index) {
+    UI.table.highscores.children[index].classList.add('highlight');
+}
+
+/**
+ * Remove highlight from all highscore rows
+ */
+function unhighlightHighscore() {
+    for (const row of UI.table.highscores.children) {
+        row.classList.remove('highlight');
+    }
+}
+
+/**
+ * Add highscore row to UI
+ * @param {object} highscore Highscore
+ */
+function createHighscoreRow(highscore) {
+    const row = document.createElement('tr');
+    const name = document.createElement('td');
+    const score = document.createElement('td');
+
+    name.textContent = (highscore.name != null) ? highscore.name : browser.i18n.getMessage('highscoreUnknownName');
+    score.textContent = highscore.score;
+
+    row.appendChild(name);
+    row.appendChild(score);
+    UI.table.highscores.appendChild(row);
+}
+
+/**
+ * Change visible screen
+ * @param {string} screen Screen
+ */
+function changeScreen(screen) {
+    for (const s of Object.values(UI.screen)) {
+        s.classList.add('hide');
+    }
+
+    UI.screen[screen].classList.remove('hide');
+    unhighlightHighscore();
+}
+
+/**
+ * Format nickname to acceptable format
+ */
+function formatNickname() {
+    let nickname = UI.input.nickname.value;
+    nickname = nickname.trim().toUpperCase();
+
+    if (nickname.length > 3) {
+        nickname = nickname.substring(0, 3);
+    }
+
+    UI.input.nickname.value = nickname;
 }
 
 const UI = {
@@ -165,10 +330,25 @@ const UI = {
             blue: document.getElementById('button-blue')
         },
 		start: document.getElementById('button-start'),
-        audio: document.getElementById('button-audio')
+        audio: document.getElementById('button-audio'),
+        back: document.getElementById('button-back'),
+        highscores: document.getElementById('button-highscores')
 	},
     text: {
         round: document.getElementById('text-round')
+    },
+    input: {
+        nickname: document.getElementById('input-nickname')
+    },
+    container: {
+        pregame: document.getElementById('container-pregame')
+    },
+    table: {
+        highscores: document.getElementById('table-highscores')
+    },
+    screen: {
+        game: document.getElementById('screen-game'),
+        highscores: document.getElementById('screen-highscores')
     }
 };
 
@@ -192,11 +372,17 @@ UI.button.color.blue.addEventListener('click', handleGameButtonPress);
 UI.button.color.yellow.addEventListener('click', handleGameButtonPress);
 UI.button.start.addEventListener('click', startGame);
 UI.button.audio.addEventListener('click', toggleAudio);
+UI.button.highscores.addEventListener('click', () => { changeScreen('highscores'); });
+UI.button.back.addEventListener('click', () => { changeScreen('game'); });
+UI.input.nickname.addEventListener('keyup', formatNickname);
 
 const buttonLightDuration = 500;
 const buttonDelay = 600;
 const roundDelay = 1000;
+const maxHighscoresSaved = 10;
 let audioEnabled = true;
+let highscores = new Array();
+let lastUsedName = null;
 
 let pattern = new Array();
 let currentGuessingPosition = 0;
