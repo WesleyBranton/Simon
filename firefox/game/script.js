@@ -59,6 +59,7 @@ function handleGameButtonPress(event) {
 function buttonPress(color) {
     // Play audio
     if (audioEnabled) {
+        AUDIO[color].currentTime = 0;
         AUDIO[color].play();
     }
 
