@@ -55,6 +55,7 @@ function toggleGameButtons(enabled) {
  * @param {Event} event Button event
  */
 function handleGameButtonPress(event) {
+    clearTimeout(timeoutGameOver);
 	const color = COLOR[event.target.dataset.color];
 	buttonPress(color);
 
@@ -63,6 +64,10 @@ function handleGameButtonPress(event) {
 
         if (currentGuessingPosition >= pattern.length) {
             startRound();
+        } else {
+            timeoutGameOver = setTimeout(() => {
+                gameOver();
+            }, maxWaitTime + buttonLightDuration);
         }
     } else {
         gameOver();
@@ -153,6 +158,9 @@ function playPattern(index) {
         }, buttonDelay);
     } else {
         toggleGameButtons(true);
+        timeoutGameOver = setTimeout(() => {
+            gameOver();
+        }, maxWaitTime);
     }
 }
 
@@ -380,6 +388,8 @@ const buttonLightDuration = 500;
 const buttonDelay = 600;
 const roundDelay = 1000;
 const maxHighscoresSaved = 10;
+const maxWaitTime = 2000;
+let timeoutGameOver = null;
 let audioEnabled = true;
 let highscores = new Array();
 let lastUsedName = null;
